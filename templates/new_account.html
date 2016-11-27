@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h1>New Account</h1>
+  <form action="{{ url_for('new_account') }}" method='post'>
+    <dl>
+      <dt>Username:
+      <dd><input type=text class="form-control" placeholder="Username" aria-describedby="basic-addon1" name=username>
+      <br>
+      <dt>Password:
+      <dd><input type="password" class="form-control" placeholder="Password" aria-describedby="basic-addon1" name=password>
+      <br>
+      <dd><input type="password" class="form-control" placeholder="Retype Password" aria-describedby="basic-addon1" name=password2>
+      <br>
+      <dt>Email:
+      <dd><input type="email" class="form-control" placeholder="example@example.com" aria-describedby="basic-addon1" name=email>
+      <br><br>
+      <dd><button type=submit class="btn btn-default">Next</button>
+    </dl>
+  </form>
+{% endblock %}

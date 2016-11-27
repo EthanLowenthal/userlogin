@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block body %}
+    <body>
+       <form action="{{ url_for('user_settings') }}" method="post">
+           <dd></dd><h2>Change Username</h2>
+           <dd><input type=text class="form-control" placeholder="Username" aria-describedby="basic-addon1" name=username>
+           <br>
+           <dd></dd><h2>Change Password</h2>
+           <dd><input type=password class="form-control" placeholder="Password" aria-describedby="basic-addon1" name=password>
+           <br>
+           <dd><input type="password" class="form-control" placeholder="Retype Password" aria-describedby="basic-addon1" name=password2>
+           <br>
+           <dd></dd><h2>Change Email</h2>
+           <dd><input type=text class="form-control" placeholder="example@example.com" aria-describedby="basic-addon1" name=email>
+           <br>
+           <dd><button type=submit class="btn btn-default">Change</button>
+       </form>
+    </body>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal">Delete Account</button>
+
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h4 class="modal-title">Are You Shure?</h4>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-danger" href="{{ url_for('delete_account') }}" role="button">Delete Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

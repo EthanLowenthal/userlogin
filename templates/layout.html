@@ -1,0 +1,42 @@
+<!doctype html>
+<title>Log Me In</title>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<style>
+body {
+    background: #002a33;
+    margin: 0px;
+    padding: 0px;
+}
+</style>
+<header>
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+                <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for('home') }}">Home</a>
+            </div>
+                {% if session.logged_in %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{{ url_for('user_settings') }}">Profile</a></li>
+                    <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
+                </ul>
+                {% else %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{{ url_for('new_account') }}">Register</a></li>
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                </ul>
+                {% endif %}
+        </div>
+    </nav>
+</header>
+{% for message in get_flashed_messages() %}
+    <div class="alert alert-success" role="alert" style="margin: -20px 0px">{{ message }}</div>
+{% endfor %}
+<div style="background:#fffff4; margin-right: 40px; margin-left: 40px;">
+    <div style="margin: 0px 60px">
+{% block body %}{% endblock %}
+    </div>
+</div>
