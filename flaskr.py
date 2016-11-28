@@ -182,10 +182,17 @@ def forgot_pass():
     return render_template('recovery.html')
 
 
-@app.route('/manage')
+@app.route('/manage', methods = ['GET', 'POST'])
 def manage_users():
     manage_db = sqlite3.connect('users.db')
     curs = manage_db.cursor()
     curs.execute('''SELECT * from user''')
-    accounts = curs.fetchone()
+    accounts = curs.fetchall()
+    for i in range(len(accounts)):
+        accounts[i] = str(accounts[i])
+        print(accounts[i])
+    if request.method == 'POST':
+        delete_acc_db = sqlite3.connect('users.db')
+        curs = delete_acc_db.cursor()
+        curs.execute('''DELETE FROM user WHERE username = ?''', [(account)])
     return render_template('manage.html', users=accounts)
