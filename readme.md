@@ -7,7 +7,7 @@ Log Me In is a program to log users in and out. Log Me In supports email recover
 
 ##Installation
 ```
-https://github.com/EthanLowenthal/userlogin.git
+git clone https://github.com/EthanLowenthal/userlogin.git
 ```
 
 ###Dependencies
