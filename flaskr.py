@@ -175,10 +175,10 @@ def logout():
 @app.route('/recovery', methods = ['GET', 'POST'])
 def forgot_pass():
     if request.method == 'POST':
-        email = request.form['email']
+        acc_info = request.form['acc_info']
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('select * from user where email = ?', [(email)])
+        curs.execute('select * from user where email = ? or username = ?', [(acc_info), (acc_info)])
         user = curs.fetchone()
         if user == None:
             flash('Email not found')
