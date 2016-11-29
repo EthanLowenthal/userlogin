@@ -26,6 +26,7 @@ try:
 except:
     pass
 user_db.commit()
+user_db.close()
 
 
 @app.route('/')
@@ -67,6 +68,7 @@ def user_settings():
         curs = local_user_db.cursor()
         curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (password), (email), (session['user'][0])])
         local_user_db.commit()
+        local_user_db.close()
         session['user'] = (username, password, email)
     return render_template('settings.html')
 
@@ -77,8 +79,9 @@ def delete_account():
     curs = delete_acc_db.cursor()
     curs.execute('''DELETE FROM user WHERE username = ?''', [(session['user'][0])])
     delete_acc_db.commit()
+    delete_acc_db.close()
     flash('Account Deleted')
-    session.pop(['user'], None)
+    session.pop('user', None)
     return redirect(url_for('home'))
 
 
@@ -95,14 +98,15 @@ def login():
         curs = local_user_db.cursor()
         curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (request.form['password'])])
         session['user'] = curs.fetchone()
-
         if session['user'] == None:
             flash('Invalid Credentials')
-            session.pop(['user'], None)
+            session.pop('user', None)
+            local_user_db.close()
         else:
             request.form['password'], curs.execute('select email from user where username = ?', [(request.form['username'])])
             session['user'] = (request.form['username'], request.form['password'], curs.fetchone()[0])
             flash('You logged in as %s' % session['user'][0])
+            local_user_db.close()
             return redirect(url_for('home'))
     return render_template('login.html', error=error)
 
@@ -144,6 +148,7 @@ def confirm_account():
             curs = confirm_db.cursor()
             curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(username), (password), (confirm_email)])
             confirm_db.commit()
+            confirm_db.close()
             flash('Account Created')
             return redirect(url_for('login'))
         else:
@@ -172,6 +177,7 @@ def forgot_pass():
         curs = local_user_db.cursor()
         curs.execute('select * from user where email = ?', [(email)])
         user = curs.fetchone()
+        local_user_db.close()
         if user == None:
             flash('Email not found')
         else:
@@ -181,8 +187,11 @@ def forgot_pass():
             flash('Email Sent!')
     return render_template('recovery.html')
 
+# @app.route('/manage/user')
+# def manage_user():
+#     return render_template('manage_user.html', user='Ethan')
 
-@app.route('/manage', methods = ['GET', 'POST'])
+@app.route('/manage', methods=['GET', 'POST'])
 def manage_users():
     manage_db = sqlite3.connect('users.db')
     curs = manage_db.cursor()
@@ -190,9 +199,11 @@ def manage_users():
     accounts = curs.fetchall()
     for i in range(len(accounts)):
         accounts[i] = str(accounts[i])
-        print(accounts[i])
     if request.method == 'POST':
-        delete_acc_db = sqlite3.connect('users.db')
-        curs = delete_acc_db.cursor()
-        curs.execute('''DELETE FROM user WHERE username = ?''', [(account)])
+        create_user_db = sqlite3.connect('users.db')
+        curs = create_user_db.cursor()
+        curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (request.form['password']), (request.form['email'])])
+        create_user_db.commit()
+        create_user_db.close()
     return render_template('manage.html', users=accounts)
+
