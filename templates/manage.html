@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block body %}
+<h1>Manage Users</h1>
+<div class="list-group">
+    <div class="list-group-item">
+    <form action="{{ url_for('manage_users') }}" method='post'>
+    {% for u in users %}
+            <input type="radio" class="list-group-item" name="user" value="{{ u }}">{{ u }}
+    {% endfor %}
+    <br>
+    <button type=submit class="btn btn-default">Manage User</button>
+    </form>
+    </div>
+</div>
+
+<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Create Accountt</button>
+
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h4 class="modal-title">Create Account</h4>
+            <form action="{{ url_for('manage_users') }}" method='post'>
+            <h5>Username:</h5>
+            <input type=text class="form-control" placeholder="Username" aria-describedby="basic-addon1" name=username>
+            <br>
+            <h5>Password:</h5>
+            <input type="password" class="form-control" placeholder="Password" aria-describedby="basic-addon1" name=password>
+            <br>
+            <h5>Email:</h5>
+            <input type="email" class="form-control" placeholder="example@example.com" aria-describedby="basic-addon1" name=email>
+            <br>
+            <button type="submit" class="btn btn-">Create Account</button>
+            <button class="btn btn-sucsess">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
