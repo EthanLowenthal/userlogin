@@ -39,3 +39,6 @@ It should run on http://127.0.0.1:5000/ or http://0.0.0.0:5000/
 
 The defualt username is admin, and the default password is default. This account cannot be changed or deleted. Any changes made to this account will be saved to a new account.
 
+###Admin Accounts
+If you arre logged in as admin, a "Manage Users" button will appear on the home page. This allows the admin to see all of the accounts including passwords and emails, create accounts without email verifacation (quick create), and delete accounts (It sends an email to that account's user saying that their account has been deleted).
+
