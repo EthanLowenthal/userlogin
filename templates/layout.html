@@ -22,7 +22,7 @@ body {
             </div>
                 {% if 'user' in session %}
                 <ul class="nav navbar-nav navbar-right">
-                    {% if user != 'admin' %}
+                    {% if session['user'][0] != 'admin' %}
                     <li><a href="{{ url_for('user_settings') }}">Profile</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('logout') }}">Sign Out</a></li>
