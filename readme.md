@@ -34,7 +34,7 @@ export FLASK_DEBUG=1
 flask run
 ```
 
-It should run on http://127.0.0.1:5000/
+It should run on http://127.0.0.1:5000/ or http://0.0.0.0:5000/
 
 
 The defualt username is admin, and the default password is default. This account cannot be changed or deleted. Any changes made to this account will be saved to a new account.
