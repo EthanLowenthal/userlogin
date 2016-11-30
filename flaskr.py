@@ -17,16 +17,16 @@ server.starttls()
 server.ehlo()
 server.login('logmeinpassrecovery@gmail.com', 'logmeinmail')
 
-user_db = sqlite3.connect('users.db')
-db = user_db.cursor()
+db = sqlite3.connect('users.db')
+cursor = db.cursor()
 
-db.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
+cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
 try:
-    db.execute('''INSERT INTO user VALUES ('admin', 'default', 'ethanmlowenthal@gmail.com')''')
+    cursor.execute('''INSERT INTO user VALUES ('admin', 'default', 'ethanmlowenthal@gmail.com')''')
 except:
     pass
-user_db.commit()
-user_db.close()
+db.commit()
+db.close()
 
 @app.route('/')
 def home():
