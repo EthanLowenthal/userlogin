@@ -21,7 +21,6 @@ Make shure your working directory is the one with all the files, not the one wit
 
 The first time running, you need to create a file called 'users.db'
 
-Run this:
 ###Normal
 ```python
 python run.py
