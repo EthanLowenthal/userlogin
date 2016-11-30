@@ -1,5 +1,5 @@
 #*.db
 *.pyc
-.idea
+#.idea
 __pycache__
-*.xml
+#*.xml

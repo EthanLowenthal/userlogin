@@ -80,7 +80,6 @@ def delete_account():
             delete_acc_db.commit()
             email = curs.fetchone()
             if email is None:
-                print(curs.fetchone())
                 flash('Username not found')
                 return redirect(url_for('manage_users'))
             else:
