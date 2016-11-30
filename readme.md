@@ -14,7 +14,7 @@ git clone https://github.com/EthanLowenthal/userlogin.git
 ```sh
 pip install -r reqirements.txt
 ```
-*That is th right code, but it only works when I manually type it in*
+*That is the right code, but it only works when I manually type it in*
 
 
 ##Running
