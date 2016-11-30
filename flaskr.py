@@ -70,16 +70,33 @@ def user_settings():
     return render_template('settings.html')
 
 
-@app.route('/settings/delete')
+@app.route('/settings/delete', methods=['GET', 'POST'])
 def delete_account():
-    delete_acc_db = sqlite3.connect('users.db')
-    curs = delete_acc_db.cursor()
-    curs.execute('''DELETE FROM user WHERE username = ?''', [(session['user'][0])])
-    delete_acc_db.commit()
-    delete_acc_db.close()
-    flash('Account Deleted')
-    session.pop('user', None)
-    return redirect(url_for('home'))
+    if request.method == 'POST':
+        delete_acc_db = sqlite3.connect('users.db')
+        curs = delete_acc_db.cursor()
+        if session['user'][0] == 'admin':
+            curs.execute('''SELECT * FROM user WHERE username = ?''', [(request.form['usr'])])
+            delete_acc_db.commit()
+            email = curs.fetchone()
+            if email is None:
+                print(curs.fetchone())
+                flash('Username not found')
+                return redirect(url_for('manage_users'))
+            else:
+                curs.execute('''DELETE FROM user WHERE username = ?''', [(request.form['usr'])])
+                message = 'Subject: %s\n\n%s' % ('Your Account was Deleted','Your account was deleted by an administrator because:\n' + request.form['msg'])
+                server.sendmail('logmeinpassrecovery@gmail.com', email[2], message)
+        else:
+            curs.execute('''DELETE FROM user WHERE username = ?''', [(session['user'][0])])
+        delete_acc_db.commit()
+        delete_acc_db.close()
+        flash('Account Deleted')
+        if session['user'][0] != 'admin':
+            session.pop('user', None)
+            return redirect(url_for('home'))
+        else:
+            return redirect(url_for('manage_users'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -173,9 +190,6 @@ def forgot_pass():
             flash('Email Sent!')
     return render_template('recovery.html')
 
-# @app.route('/manage/user')
-# def manage_user():
-#     return render_template('manage_user.html', user='Ethan')
 
 @app.route('/manage', methods=['GET', 'POST'])
 def manage_users():
@@ -188,7 +202,18 @@ def manage_users():
     if request.method == 'POST':
         create_user_db = sqlite3.connect('users.db')
         curs = create_user_db.cursor()
-        curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (request.form['password']), (request.form['email'])])
+        if request.form['email'] == '':
+            flash('Email Cannot be Blank')
+            return render_template('manage.html', users=accounts)
+        try:
+            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (request.form['password']), (request.form['email'])])
+        except sqlite3.IntegrityError:
+            flash('Username is allready taken')
         create_user_db.commit()
+        curs.execute('''SELECT * from user''')
+        accounts = curs.fetchall()
+        for i in range(len(accounts)):
+            accounts[i] = str(accounts[i])
         create_user_db.close()
     return render_template('manage.html', users=accounts)
+

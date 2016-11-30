@@ -29,7 +29,9 @@
         <div class="modal-body">
           <h4 class="modal-title">Are You Shure?</h4>
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-danger" href="{{ url_for('delete_account') }}" role="button">Delete Account</a>
+            <form action="{{ url_for('delete_account') }}" method=post>
+                <button class="btn btn-danger" type="submit">Delete Account</button>
+            </form>
         </div>
       </div>
     </div>

@@ -2,20 +2,15 @@
 {% block body %}
 <h1>Manage Users</h1>
 <div class="list-group">
-    <div class="list-group-item">
-    <form action="{{ url_for('manage_users') }}" method='post'>
     {% for u in users %}
-            <input type="radio" class="list-group-item" name="user" value="{{ u }}">{{ u }}
+        <li class="list-group-item">{{ u }}</li>
     {% endfor %}
-    <br>
-    <button type=submit class="btn btn-default">Manage User</button>
-    </form>
-    </div>
 </div>
 
-<button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">Create Accountt</button>
+<button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_account">Create Account</button>
+<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete_account">Delete Account</button>
 
-  <div class="modal fade" id="myModal" role="dialog">
+  <div class="modal fade" id="create_account" role="dialog">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-body">
@@ -31,7 +26,27 @@
             <input type="email" class="form-control" placeholder="example@example.com" aria-describedby="basic-addon1" name=email>
             <br>
             <button type="submit" class="btn btn-">Create Account</button>
-            <button class="btn btn-sucsess">Cancel</button>
+            <button class="btn btn-sucsess" data-dismiss="modal">Cancel</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="delete_account" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h4 class="modal-title">Delete Account</h4>
+            <form action="{{ url_for('delete_account') }}" method='post'>
+            <h5>Type the name of an account to delete:</h5>
+            <input type=text class="form-control" placeholder="Username" aria-describedby="basic-addon1" name=usr>
+            <br>
+            <h5>Please include a short messge:</h5>
+            <input type=text class="form-control" placeholder="Message" aria-describedby="basic-addon1" name=msg>
+            <button type="submit" class="btn btn-danger">Delete Account</button>
+            <button class="btn btn-sucsess" data-dismiss="modal">Cancel</button>
+            </form>
         </div>
       </div>
     </div>
