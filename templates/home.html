@@ -1,11 +1,17 @@
 {% extends "layout.html" %}
 {% block body %}
+{% for request in requests %}
+    <div class="alert alert-success" role="alert">
+        <a href="#" class="alert-link">{{ request }}</a>
+    </div>
+{% endfor %}
   <body>
     <div class="jumbotron">
       <h1>Welcome, {{ user }}</h1>
       <p>You are using Log Me In by Ethan</p>
         {% if user == 'admin' %}
         <a class="btn btn-default" href="{{ url_for('manage_users') }}" role="button">Manage Users</a>
+        <a class="btn btn-default" href="{{ url_for('add_friend') }}" role="button">Add Friends</a>
         {% endif %}
     </div>
   </body>

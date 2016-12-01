@@ -21,8 +21,12 @@ db = sqlite3.connect('users.db')
 cursor = db.cursor()
 
 cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
+cursor.execute('''CREATE TABLE if not exists friends (account text primary key, username text, requests text)''')
 try:
     cursor.execute('''INSERT INTO user VALUES ('admin', 'default', 'ethanmlowenthal@gmail.com')''')
+    db.commit()
+    cursor.execute('''INSERT INTO friends (account) VALUES ('admin')''')
+    db.commit()
 except:
     pass
 db.commit()
@@ -199,7 +203,7 @@ def manage_users():
     for i in range(len(accounts)):
         accounts[i] = str(accounts[i])
     if request.method == 'POST':
-        create_user_db = sqlite3.connect('users.db')
+        create_user_db = sqlite3.connect('Users.db')
         curs = create_user_db.cursor()
         if request.form['email'] == '':
             flash('Email Cannot be Blank')
@@ -215,4 +219,21 @@ def manage_users():
             accounts[i] = str(accounts[i])
         create_user_db.close()
     return render_template('manage.html', users=accounts)
+
+@app.route('/addfriend', methods=['GET', 'POST'])
+def add_friend():
+    if request.method == 'POST':
+        create_user_db = sqlite3.connect('Users.db')
+        curs = create_user_db.cursor()
+        curs.execute('''SELECT * from user where username = ?''', [(request.form['friend'])])
+        user = curs.fetchall()
+        if user is None:
+            flash('User not found')
+            return render_template('addFriend.html')
+        else:
+            flash('Friend request sent')
+            curs.execute('''UPDATE friends SET requests = ? where username = ?''', [(session['user'][0]+','), (request.form['friend']) ])
+        create_user_db.commit()
+        create_user_db.close()
+    return render_template('addFriend.html')
 
