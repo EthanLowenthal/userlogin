@@ -1,18 +1,29 @@
 {% extends "layout.html" %}
-{% block body %}
+{% block head %}
 {% for request in requests %}
-    <div class="alert alert-success" role="alert">
-        <a href="#" class="alert-link">{{ request }}</a>
-    </div>
+    {% if request[0] is not none %}
+        <div class="alert alert-success" role="alert">
+            <form action="{{ url_for('friend_request') }}" method="post">
+                    {{ request[0] }} wants your be your friend
+                    <input type="hidden" name="user" value="{{ request }}">
+                    <input type="radio" name="selection" value="accept"> Accept
+                    <input type="radio" name="selection" value="decline"> Decline
+                    <button class="alert-link" type="submit">Submit</button>
+
+            </form>
+        </div>
+    {% endif %}
 {% endfor %}
+{% endblock %}
+{% block body %}
   <body>
     <div class="jumbotron">
       <h1>Welcome, {{ user }}</h1>
       <p>You are using Log Me In by Ethan</p>
         {% if user == 'admin' %}
         <a class="btn btn-default" href="{{ url_for('manage_users') }}" role="button">Manage Users</a>
-        <a class="btn btn-default" href="{{ url_for('add_friend') }}" role="button">Add Friends</a>
         {% endif %}
+        <a class="btn btn-default disabled" href="{{ url_for('add_friend') }}" role="button">Add Friends (work in progress)</a>
     </div>
   </body>
 {% endblock %}

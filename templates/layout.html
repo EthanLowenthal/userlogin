@@ -37,8 +37,9 @@ body {
     </nav>
 </header>
 {% for message in get_flashed_messages() %}
-    <div class="alert alert-success" role="alert" style="margin: -20px 0px">{{ message }}</div>
+    <div class="alert alert-success" role="alert">{{ message }}</div>
 {% endfor %}
+{% block head %}{% endblock %}
 <div style="background:#fffff4; margin-right: 40px; margin-left: 40px;">
     <div style="margin: 0px 60px">
 {% block body %}{% endblock %}

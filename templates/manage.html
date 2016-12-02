@@ -3,7 +3,7 @@
 <h1>Manage Users</h1>
 <div class="list-group">
     {% for u in users %}
-        <li class="list-group-item">{{ u }}</li>
+        <div class="list-group-item">{{ u }}</div>
     {% endfor %}
 </div>
 
@@ -25,7 +25,7 @@
             <h5>Email:</h5>
             <input type="email" class="form-control" placeholder="example@example.com" aria-describedby="basic-addon1" name=email>
             <br>
-            <button type="submit" class="btn btn-">Create Account</button>
+            <button type="submit" class="btn btn-default">Create Account</button>
             <button class="btn btn-sucsess" data-dismiss="modal">Cancel</button>
             </form>
         </div>

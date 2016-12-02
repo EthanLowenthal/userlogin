@@ -25,6 +25,9 @@ cursor.execute('''CREATE TABLE if not exists friends (account text primary key, 
 try:
     cursor.execute('''INSERT INTO user VALUES ('admin', 'default', 'ethanmlowenthal@gmail.com')''')
     db.commit()
+except:
+    pass
+try:
     cursor.execute('''INSERT INTO friends (account) VALUES ('admin')''')
     db.commit()
 except:
@@ -36,7 +39,16 @@ db.close()
 def home():
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template('home.html', user = session['user'][0])
+    db = sqlite3.connect('users.db')
+    curs = db.cursor()
+    user = session['user'][0]
+    curs.execute('''select requests from friends where account = ?''', [(user)])
+    requests = curs.fetchall()
+    if requests != [] and requests is not None and requests[0][0] is not None:
+        requests[0][0].split(',')
+    if '' in requests:
+        requests.remove('')
+    return render_template('home.html', user = user, requests=requests)
 
 
 
@@ -160,6 +172,8 @@ def confirm_account():
             curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''',
                          [(username), (password), (confirm_email)])
             confirm_db.commit()
+            curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
+            confirm_db.commit()
             confirm_db.close()
             flash('Account Created')
             return redirect(url_for('login'))
@@ -210,6 +224,9 @@ def manage_users():
             return render_template('manage.html', users=accounts)
         try:
             curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (request.form['password']), (request.form['email'])])
+            create_user_db.commit()
+            curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
+            create_user_db.commit()
         except sqlite3.IntegrityError:
             flash('Username is allready taken')
         create_user_db.commit()
@@ -232,8 +249,42 @@ def add_friend():
             return render_template('addFriend.html')
         else:
             flash('Friend request sent')
-            curs.execute('''UPDATE friends SET requests = ? where username = ?''', [(session['user'][0]+','), (request.form['friend']) ])
+            print(request.form['friend'], session['user'][0])
+            curs.execute('''UPDATE friends SET requests = ? where account = ?''', [(session['user'][0]+','), (request.form['friend']) ])
         create_user_db.commit()
         create_user_db.close()
     return render_template('addFriend.html')
+
+@app.route('/friends/add', methods=['GET', 'POST'])
+def friend_request():
+    if request.method == 'POST':
+        if request.form['selection'] == 'accept':
+            add = True
+        else:
+            add = False
+
+        friend_db = sqlite3.connect('Users.db')
+        curs = friend_db.cursor()
+        curs.execute('''SELECT requests from friends where account = ?''', [(session['user'][0])])
+        user = curs.fetchone()
+        if user is None:
+            flash('There was a error')
+            return render_template('home.html', user=session['user'][0])
+        user = user[0]
+        curs.execute('''UPDATE friends SET requests = ? where account = ?''',[(None), (session['user'][0])])
+        friend_db.commit()
+        user.split(',').remove('')
+        if add:
+            curs.execute('''select username from friends where account = ?''', [(session['user'][0])])
+            friends = curs.fetchall()
+            print(friends)
+            print(request.form['user'])
+            friends = friends[0][0] + ',' + request.form['user'][0].replace(',', '')
+            curs.execute('''UPDATE friends SET username = ? where account = ?''', [(friends), (session['user'][0])])
+            friend_db.commit()
+            curs.execute('''UPDATE friends SET requests = ? where account = ?''', [(user), (session ['user'][0])])
+            friend_db.commit()
+        friend_db.close()
+    return redirect(url_for('home'))
+    # return redirect(url_for('home'))
 
