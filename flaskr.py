@@ -1,6 +1,7 @@
 # all the imports
-import smtplib, random, sqlite3
+import smtplib, random, sqlite3, string
 from flask import Flask, request, session, redirect, url_for, render_template, flash
+
 
 
 app = Flask(__name__)
@@ -20,10 +21,17 @@ server.login('logmeinpassrecovery@gmail.com', 'logmeinmail')
 db = sqlite3.connect('users.db')
 cursor = db.cursor()
 
+def code(message):
+    rot13 = string.maketrans(
+        "ABCDEFGHIJKLMabcdefghijklmNOPQRSTUVWXYZnopqrstuvwxyz1234567890 ",
+        "NOPQRSTUVWXYZnopqrstuvwxyz1234567890 ABCDEFGHIJKLMabcdefghijklm")
+    return string.translate(message, rot13)
+
+
 cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
 cursor.execute('''CREATE TABLE if not exists friends (account text primary key, username text, requests text)''')
 try:
-    cursor.execute('''INSERT INTO user VALUES ('admin', 'default', 'ethanmlowenthal@gmail.com')''')
+    cursor.execute('''INSERT INTO user VALUES ('admin', ?, 'ethanmlowenthal@gmail.com')''', [(code('default'.decode().encode('utf-8')))])
     db.commit()
 except:
     pass
@@ -79,7 +87,7 @@ def user_settings():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (password), (email), (session['user'][0])])
+        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (code(password.decode().encode('utf-8'))), (email), (session['user'][0])])
         local_user_db.commit()
         local_user_db.close()
         session['user'] = (username, password, email)
@@ -100,11 +108,16 @@ def delete_account():
                 return redirect(url_for('manage_users'))
             else:
                 curs.execute('''DELETE FROM user WHERE username = ?''', [(request.form['usr'])])
+                delete_acc_db.commit()
+                curs.execute('''DELETE FROM friends WHERE account = ?''', [(request.form['usr'])])
+                delete_acc_db.commit()
                 message = 'Subject: %s\n\n%s' % ('Your Account was Deleted','Your account was deleted by an administrator because:\n' + request.form['msg'])
                 server.sendmail('logmeinpassrecovery@gmail.com', email[2], message)
         else:
             curs.execute('''DELETE FROM user WHERE username = ?''', [(session['user'][0])])
-        delete_acc_db.commit()
+            delete_acc_db.commit()
+            curs.execute('''DELETE FROM friends WHERE account = ?''', [(request.form['usr'])])
+            delete_acc_db.commit()
         delete_acc_db.close()
         flash('Account Deleted')
         if session['user'][0] != 'admin':
@@ -125,7 +138,7 @@ def login():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (request.form['password'])])
+        curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (code(request.form['password'].decode().encode('utf-8')))])
         session['user'] = curs.fetchone()
         if session['user'] == None:
             flash('Invalid Credentials')
@@ -170,7 +183,7 @@ def confirm_account():
             confirm_db = sqlite3.connect('users.db')
             curs = confirm_db.cursor()
             curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''',
-                         [(username), (password), (confirm_email)])
+                         [(username), (code(password.decode().encode('utf-8'))), (confirm_email)])
             confirm_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
             confirm_db.commit()
@@ -201,7 +214,7 @@ def forgot_pass():
         if user == None:
             flash('Email not found')
         else:
-            text = 'Hello, ' + user[0] + '\nYour password is ' + user[1]
+            text = 'Hello, ' + user[0] + '\nYour password is ' + code(user[1].decode().encode('utf-8'))
             message = 'Subject: %s\n\n%s' % ('Account Recovery', text)
             server.sendmail('logmeinpassrecovery@gmail.com', email, message)
             flash('Email Sent!')
@@ -223,7 +236,7 @@ def manage_users():
             flash('Email Cannot be Blank')
             return render_template('manage.html', users=accounts)
         try:
-            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (request.form['password']), (request.form['email'])])
+            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (code(request.form['password'].decode().encode('utf-8'))), (request.form['email'])])
             create_user_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
             create_user_db.commit()
@@ -244,9 +257,15 @@ def add_friend():
         curs = create_user_db.cursor()
         curs.execute('''SELECT * from user where username = ?''', [(request.form['friend'])])
         user = curs.fetchall()
+        curs.execute('''SELECT * from friends where account = ?''', [(request.form['friend'])])
+        friend_list = curs.fetchall()
         if user is None:
             flash('User not found')
             return render_template('addFriend.html')
+        for x in friend_list:
+            if x in user:
+                flash('User is allready friends with you')
+                return render_template('addFriend.html')
         else:
             flash('Friend request sent')
             print(request.form['friend'], session['user'][0])
@@ -271,6 +290,9 @@ def friend_request():
             flash('There was a error')
             return render_template('home.html', user=session['user'][0])
         user = user[0]
+        print(user, request.form['user'].split("'")[1])
+        user.replace(request.form['user'], '')
+        print(user)
         curs.execute('''UPDATE friends SET requests = ? where account = ?''',[(None), (session['user'][0])])
         friend_db.commit()
         user.split(',').remove('')
@@ -278,11 +300,17 @@ def friend_request():
             curs.execute('''select username from friends where account = ?''', [(session['user'][0])])
             friends = curs.fetchall()
             print(friends)
-            print(request.form['user'])
-            friends = friends[0][0] + ',' + request.form['user'][0].replace(',', '')
+            friends = friends[0][0] + ',' + request.form['user'].split("'")[1].replace(',', '')
             curs.execute('''UPDATE friends SET username = ? where account = ?''', [(friends), (session['user'][0])])
             friend_db.commit()
-            curs.execute('''UPDATE friends SET requests = ? where account = ?''', [(user), (session ['user'][0])])
+            curs.execute('''select username from friends where account = ?''', [(request.form['user'].split("'")[1])])
+            friends = curs.fetchall()
+            print(friends)
+            if friends == []:
+                friends = session['user'][0]
+            else:
+                friends = friends[0][0] + ',' + session['user'][0]
+            curs.execute('''UPDATE friends SET username = ? where account = ?''', [(friends), (request.form['user'].split("'")[1])])
             friend_db.commit()
         friend_db.close()
     return redirect(url_for('home'))
