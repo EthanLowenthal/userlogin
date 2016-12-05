@@ -42,3 +42,6 @@ The defualt username is admin, and the default password is default. This account
 ###Admin Accounts
 If you arre logged in as admin, a "Manage Users" button will appear on the home page. This allows the admin to see all of the accounts including passwords and emails, create accounts without email verifacation (quick create), and delete accounts (It sends an email to that account's user saying that their account has been deleted).
 
+
+**Passwords are encoded** (I won't say how, because it makes it eaiser for people to decode them)
+
