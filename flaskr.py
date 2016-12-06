@@ -264,16 +264,15 @@ def add_friend():
             flash('User not found')
             return render_template('addFriend.html')
         for x in friend_list[0][1].split("'"):
-            print(str(friend_list[0][1].split("'")) + '     Friends_list')
-            print(str(user) + '     user')
-            print(str(x) + '     x')
             if x in user:
                 flash('User is allready friends with you')
                 return render_template('addFriend.html')
         else:
             flash('Friend request sent')
-            print(request.form['friend'], session['user'][0])
-            curs.execute('''UPDATE friends SET requests = ? where account = ?''', [(session['user'][0]+','), (request.form['friend']) ])
+            curs.execute('''select requests from friends where account = ?''', [(request.form['friend'])])
+            curr_requests = curs.fetchone()
+            curr_requests = curr_requests[0] + session['user'][0] + ','
+            curs.execute('''UPDATE friends SET requests = ? where account = ?''', [(curr_requests[0][0]), (request.form['friend']) ])
         create_user_db.commit()
         create_user_db.close()
     return render_template('addFriend.html')
