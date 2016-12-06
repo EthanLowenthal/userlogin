@@ -264,6 +264,7 @@ def add_friend():
             flash('User not found')
             return render_template('addFriend.html')
         for x in friend_list:
+            print(x, user)
             if x in user:
                 flash('User is allready friends with you')
                 return render_template('addFriend.html')
@@ -291,7 +292,6 @@ def friend_request():
             flash('There was a error')
             return render_template('home.html', user=session['user'][0])
         user = user[0]
-        print(user, request.form['user'].split("'")[1])
         user.replace(request.form['user'], '').replace("'", '')
         print(user)
         curs.execute('''UPDATE friends SET requests = ? where account = ?''',[(None), (session['user'][0])])
