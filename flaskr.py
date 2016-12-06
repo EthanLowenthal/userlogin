@@ -263,8 +263,10 @@ def add_friend():
         if user is None:
             flash('User not found')
             return render_template('addFriend.html')
-        for x in friend_list:
-            print(x, user)
+        for x in friend_list[0][1].split("'"):
+            print(str(friend_list[0][1].split("'")) + '     Friends_list')
+            print(str(user) + '     user')
+            print(str(x) + '     x')
             if x in user:
                 flash('User is allready friends with you')
                 return render_template('addFriend.html')
