@@ -54,6 +54,7 @@ def home():
     requests = curs.fetchall()
     if requests != [] and requests is not None and requests[0][0] is not None:
         requests[0][0].split(',')
+    print(requests)
     if '' in requests:
         requests.remove('')
     return render_template('home.html', user = user, requests=requests)
@@ -291,7 +292,7 @@ def friend_request():
             return render_template('home.html', user=session['user'][0])
         user = user[0]
         print(user, request.form['user'].split("'")[1])
-        user.replace(request.form['user'], '')
+        user.replace(request.form['user'], '').replace("'", '')
         print(user)
         curs.execute('''UPDATE friends SET requests = ? where account = ?''',[(None), (session['user'][0])])
         friend_db.commit()
@@ -300,7 +301,10 @@ def friend_request():
             curs.execute('''select username from friends where account = ?''', [(session['user'][0])])
             friends = curs.fetchall()
             print(friends)
-            friends = friends[0][0] + ',' + request.form['user'].split("'")[1].replace(',', '')
+            if friends[0][0] is None:
+                friends = request.form['user'].split("'")[1].replace(',', '')
+            else:
+                friends = friends[0][0] + ',' + request.form['user'].split("'")[1].replace(',', '')
             curs.execute('''UPDATE friends SET username = ? where account = ?''', [(friends), (session['user'][0])])
             friend_db.commit()
             curs.execute('''select username from friends where account = ?''', [(request.form['user'].split("'")[1])])
