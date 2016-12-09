@@ -1,6 +1,6 @@
 #Log Me In
 [![Build Status](https://travis-ci.org/EthanLowenthal/userlogin.svg?branch=master)](https://travis-ci.org/EthanLowenthal/userlogin)
-##Running On: http://ethansloginapp.herokuapp.com/login
+##Running On (Using Heroku) : http://ethansloginapp.herokuapp.com/login
 
 Log Me In is a program to log a user in and out. Log Me In supports email recovery, user settings, and more.
 
