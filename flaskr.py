@@ -1,5 +1,5 @@
 # all the imports
-import smtplib, random, sqlite3, string
+import smtplib, random, sqlite3, string, zlib
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 
 
@@ -31,7 +31,7 @@ def code(message):
 cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
 cursor.execute('''CREATE TABLE if not exists friends (account text primary key, username text, requests text)''')
 try:
-    cursor.execute('''INSERT INTO user VALUES ('admin', ?, 'ethanmlowenthal@gmail.com')''', [(code('default'.decode().encode('utf-8')))])
+    cursor.execute('''INSERT INTO user VALUES ('admin', ?, 'ethanmlowenthal@gmail.com')''', [(zlib.compress('default'))])
     db.commit()
 except:
     pass
@@ -88,7 +88,7 @@ def user_settings():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (code(password.decode().encode('utf-8'))), (email), (session['user'][0])])
+        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (zlib.compress(password)), (email), (session['user'][0])])
         local_user_db.commit()
         local_user_db.close()
         session['user'] = (username, password, email)
@@ -139,7 +139,7 @@ def login():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (code(request.form['password'].decode().encode('utf-8')))])
+        curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (zlib.decompress(request.form['password']))])
         session['user'] = curs.fetchone()
         if session['user'] == None:
             flash('Invalid Credentials')
@@ -184,7 +184,7 @@ def confirm_account():
             confirm_db = sqlite3.connect('users.db')
             curs = confirm_db.cursor()
             curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''',
-                         [(username), (code(password.decode().encode('utf-8'))), (confirm_email)])
+                         [(username), (zlib.compress(password)), (confirm_email)])
             confirm_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
             confirm_db.commit()
@@ -215,7 +215,7 @@ def forgot_pass():
         if user == None:
             flash('Email not found')
         else:
-            text = 'Hello, ' + user[0] + '\nYour password is ' + code(user[1].decode().encode('utf-8'))
+            text = 'Hello, ' + user[0] + '\nYour password is ' + zlib.decompress(user[1])
             message = 'Subject: %s\n\n%s' % ('Account Recovery', text)
             server.sendmail('logmeinpassrecovery@gmail.com', email, message)
             flash('Email Sent!')
@@ -237,7 +237,7 @@ def manage_users():
             flash('Email Cannot be Blank')
             return render_template('manage.html', users=accounts)
         try:
-            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (code(request.form['password'].decode().encode('utf-8'))), (request.form['email'])])
+            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (zlib.compress(request.form['password'])), (request.form['email'])])
             create_user_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
             create_user_db.commit()
@@ -251,7 +251,9 @@ def manage_users():
         create_user_db.close()
     return render_template('manage.html', users=accounts)
 
-@app.route('/addfriend', methods=['GET', 'POST'])
+
+
+@app.route('/friends/add', methods=['GET', 'POST'])
 def add_friend():
     if request.method == 'POST':
         create_user_db = sqlite3.connect('Users.db')
@@ -271,13 +273,19 @@ def add_friend():
             flash('Friend request sent')
             curs.execute('''select requests from friends where account = ?''', [(request.form['friend'])])
             curr_requests = curs.fetchone()
-            curr_requests = curr_requests[0] + session['user'][0] + ','
+            if curr_requests[0] is None:
+                curr_requests = session['user'][0] + ','
+            else:
+                curr_requests = curr_requests[0] + session['user'][0] + ','
+            print(curr_requests)
             curs.execute('''UPDATE friends SET requests = ? where account = ?''', [(curr_requests[0][0]), (request.form['friend']) ])
         create_user_db.commit()
         create_user_db.close()
     return render_template('addFriend.html')
 
-@app.route('/friends/add', methods=['GET', 'POST'])
+
+
+@app.route('/friends/add_friend', methods=['GET', 'POST'])
 def friend_request():
     if request.method == 'POST':
         if request.form['selection'] == 'accept':
@@ -297,7 +305,10 @@ def friend_request():
         print(user)
         curs.execute('''UPDATE friends SET requests = ? where account = ?''',[(None), (session['user'][0])])
         friend_db.commit()
-        user.split(',').remove('')
+        if '' in user.split(','):
+            user.split(',').remove('')
+        else:
+            user.split(',')
         if add:
             curs.execute('''select username from friends where account = ?''', [(session['user'][0])])
             friends = curs.fetchall()
@@ -321,3 +332,6 @@ def friend_request():
     return redirect(url_for('home'))
     # return redirect(url_for('home'))
 
+@app.route('/friends')
+def friends():
+    return render_template('friends.html')
