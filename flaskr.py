@@ -1,5 +1,5 @@
 # all the imports
-import smtplib, random, sqlite3, string, zlib
+import smtplib, random, sqlite3, zlib
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 
 
@@ -21,11 +21,6 @@ server.login('logmeinpassrecovery@gmail.com', 'logmeinmail')
 db = sqlite3.connect('users.db')
 cursor = db.cursor()
 
-def code(message):
-    rot13 = string.maketrans(
-        "ABCDEFGHIJKLMabcdefghijklmNOPQRSTUVWXYZnopqrstuvwxyz1234567890 ",
-        "NOPQRSTUVWXYZnopqrstuvwxyz1234567890 ABCDEFGHIJKLMabcdefghijklm")
-    return string.translate(message, rot13)
 
 
 cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
