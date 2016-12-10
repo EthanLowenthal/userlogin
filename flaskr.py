@@ -19,8 +19,8 @@ server.ehlo()
 server.login('logmeinpassrecovery@gmail.com', 'logmeinmail')
 
 db = sqlite3.connect('users.db')
+db.text_factory = str
 cursor = db.cursor()
-
 
 
 cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
