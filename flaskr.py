@@ -1,5 +1,5 @@
 # all the imports
-import smtplib, random, sqlite3, zlib
+import smtplib, random, sqlite3, zlib, string
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 
 
@@ -22,11 +22,27 @@ db = sqlite3.connect('users.db')
 db.text_factory = str
 cursor = db.cursor()
 
+def code(str_):
+    result = ""
+    for v in str_:
+        c = ord(v)
+        if c >= ord('a') and c <= ord('z'):
+            if c > ord('m'):
+                c -= 13
+            else:
+                c += 13
+        elif c >= ord('A') and c <= ord('Z'):
+            if c > ord('M'):
+                c -= 13
+            else:
+                c += 13
+        result += chr(c)
+    return result
 
 cursor.execute('''CREATE TABLE if not exists user (username text primary key, password text, email text)''')
 cursor.execute('''CREATE TABLE if not exists friends (account text primary key, username text, requests text)''')
 try:
-    cursor.execute('''INSERT INTO user VALUES ('admin', ?, 'ethanmlowenthal@gmail.com')''', [(zlib.compress('default'))])
+    cursor.execute('''INSERT INTO user VALUES ('admin', ?, 'ethanmlowenthal@gmail.com')''', [(code('default'))])
     db.commit()
 except:
     pass
@@ -83,7 +99,7 @@ def user_settings():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (zlib.compress(password)), (email), (session['user'][0])])
+        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (unicode(code(password))), (email), (session['user'][0])])
         local_user_db.commit()
         local_user_db.close()
         session['user'] = (username, password, email)
@@ -134,7 +150,7 @@ def login():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (zlib.decompress(request.form['password']))])
+        curs.execute('select * from user where username = ? and password = ?', [(request.form['username']), (code(request.form['password']))])
         session['user'] = curs.fetchone()
         if session['user'] == None:
             flash('Invalid Credentials')
@@ -179,7 +195,7 @@ def confirm_account():
             confirm_db = sqlite3.connect('users.db')
             curs = confirm_db.cursor()
             curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''',
-                         [(username), (zlib.compress(password)), (confirm_email)])
+                         [(username), (code(password)), (confirm_email)])
             confirm_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
             confirm_db.commit()
@@ -210,7 +226,7 @@ def forgot_pass():
         if user == None:
             flash('Email not found')
         else:
-            text = 'Hello, ' + user[0] + '\nYour password is ' + zlib.decompress(user[1])
+            text = 'Hello, ' + user[0] + '\nYour password is ' + code(user[1])
             message = 'Subject: %s\n\n%s' % ('Account Recovery', text)
             server.sendmail('logmeinpassrecovery@gmail.com', email, message)
             flash('Email Sent!')
@@ -232,7 +248,7 @@ def manage_users():
             flash('Email Cannot be Blank')
             return render_template('manage.html', users=accounts)
         try:
-            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (zlib.compress(request.form['password'])), (request.form['email'])])
+            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(request.form['username']), (code(request.form['password'])), (request.form['email'])])
             create_user_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
             create_user_db.commit()
