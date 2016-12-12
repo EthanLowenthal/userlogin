@@ -16,6 +16,14 @@ server = smtplib.SMTP('smtp.gmail.com', 587)  # port 465 or 587
 server.ehlo()
 server.starttls()
 server.ehlo()
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+MAILER_EMAIL_BACKEND = EMAIL_BACKEND
+EMAIL_HOST = 'secure.serverfoo.com'
+EMAIL_HOST_PASSWORD = 'passwordbarbaz'
+EMAIL_HOST_USER = 'myaccount@example.com'
+EMAIL_PORT = 587
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 server.login('logmeinpassrecovery@gmail.com', 'logmeinmail')
 
 db = sqlite3.connect('users.db')
@@ -57,7 +65,7 @@ db.close()
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
-        #smtplib.sendmail('ethanmlowenthal@gmail.com', request.form['email'], request.form['message'])
+        server.sendmail('ethanmlowenthal@gmail.com', request.form['email'], request.form['message'])
         flash('Message sent!')
     if 'user' not in session:
         return redirect(url_for('login'))
