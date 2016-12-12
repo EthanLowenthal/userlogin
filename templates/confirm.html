@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="page-header">
 <h1>Confirmation</h1>
+</div>
 A comfirmation email was sent to you. Please type in the code below:
 <form action="{{ url_for('confirm_account') }}" method=post>
     <dd><input type=text class="form-control" placeholder="Code" aria-describedby="basic-addon1" name=code>

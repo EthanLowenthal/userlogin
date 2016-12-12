@@ -51,8 +51,29 @@ body {
 	<div class="container">
 		<p class="navbar-text copyright">&copy; Ethan Lowenthal 2016</p>
 		<ul class="nav navbar-nav navbar-right">
+            <li><a href="#" type="button" data-toggle="modal" data-target="#contact">Contact Me</a>
 			<li><a href="https://github.com/EthanLowenthal/userloginheroku" target="_blank">GitHub</a></li>
 		</ul>
 	</div>
 </nav>
+
+  <div class="modal fade" id="contact" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h2 class="modal-title">Contact</h2>
+            <form action="{{ url_for('home') }}" method='post'>
+                <h3>Message:</h3>
+                <input type=text class="form-control" placeholder="Message" aria-describedby="basic-addon1" name=message>
+                <h3>Your Email:</h3>
+                <input type=email class="form-control" placeholder="Your Email" aria-describedby="basic-addon1" name=email>
+                <br>
+                <button type="submit" class="btn btn-default">Send Message</button>
+                <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

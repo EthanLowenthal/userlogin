@@ -1,5 +1,5 @@
 # all the imports
-import smtplib, random, sqlite3, zlib, string
+import smtplib, random, sqlite3
 from flask import Flask, request, session, redirect, url_for, render_template, flash
 
 
@@ -54,8 +54,11 @@ except:
 db.commit()
 db.close()
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
+    if request.method == 'POST':
+        #smtplib.sendmail('ethanmlowenthal@gmail.com', request.form['email'], request.form['message'])
+        flash('Message sent!')
     if 'user' not in session:
         return redirect(url_for('login'))
     db = sqlite3.connect('users.db')
@@ -99,7 +102,7 @@ def user_settings():
 
         local_user_db = sqlite3.connect('users.db')
         curs = local_user_db.cursor()
-        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (unicode(code(password))), (email), (session['user'][0])])
+        curs.execute('''UPDATE user SET username = ?, password = ?, email = ? WHERE username = ?''', [(username), (code(password)), (email), (session['user'][0])])
         local_user_db.commit()
         local_user_db.close()
         session['user'] = (username, password, email)
