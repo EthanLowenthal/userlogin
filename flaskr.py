@@ -347,4 +347,4 @@ def friend_request():
 def friends():
     friend_db = sqlite3.connect('Users.db')
     curs = friend_db.cursor()
-    return render_template('friends.html', users=curs.execute('''select username from user''').fetchall())
+    return render_template('friends.html', users=curs.execute('''select username from user''').fetchall(), friends=None)
