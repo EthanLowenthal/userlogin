@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2ef5af31-af9d-4a77-892c-ac5a343cecdf" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/layout.html" afterPath="$PROJECT_DIR$/templates/layout.html" />
     </list>
     <ignored path="UserLogin.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -670,7 +669,14 @@
       <option name="project" value="LOCAL" />
       <updated>1481607796540</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="some styling">
+      <created>1481653606938</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1481653606938</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TodoView">
@@ -759,7 +765,8 @@
     <MESSAGE value="add contact me button" />
     <MESSAGE value="fixed contact me email bug" />
     <MESSAGE value="clean up code" />
-    <option name="LAST_COMMIT_MESSAGE" value="clean up code" />
+    <MESSAGE value="some styling" />
+    <option name="LAST_COMMIT_MESSAGE" value="some styling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
