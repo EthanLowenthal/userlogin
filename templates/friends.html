@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="alert alert-danger" role="alert">The Friends feature is still buggy!</div>
+<div class="page-header">
+<h1>Friends</h1>
+</div>
+{% if friends is none %}
+<h3>You have no friends :(</h3>
+<img src="http://www.andpop.com/wp-content/uploads/2013/06/ForeverAlone.png" style="width:250px;height:200px;">
+{% endif %}
+<div class="list-group">
+    {% if friends is not none %}
+    {% for friend in friends %}
+        <div class="list-group-item">{{ friend }}</div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% if friends is none %}
+<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add_friend">Why dont you add some! Wait... Nevermind. No one wnats to be your friend :(</button>
+{% endif %}
+{% if friends is not none %}
+<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add_friend">Add Friends</button>
+{% endif %}
+  <div class="modal fade" id="add_friend" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h1 class="modal-title">Add Friend</h1>
+            <form action="{{ url_for('add_friend') }}" method=post>
+                <h3>Username:</h3>
+                <input class="form-control"  placeholder="Username" autocomplete="off" aria-describedby="basic-addon1" name=friend>
+                <br>
+                <input type="submit" class="btn btn-default" value="GO">
+                <button class="btn btn-sucsess" data-dismiss="modal">Cancel</button>
+                <ul class="suggestionBox" style="">
+                  {% for user in users %}
+                    <li>{{ user[0] }}</li>
+                  {% endfor %}
+                </ul>
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+$(function(){
+  $('.form-control').on("focus blur", function(){
+    $(this).parent().toggleClass("expanded collapsed");
+     $(this).siblings('.suggestionBox').toggle();
+    });
+});
+</script>
+
+
+
+{% endblock %}
