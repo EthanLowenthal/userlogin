@@ -22,14 +22,6 @@ except:
 server.ehlo()
 server.starttls()
 server.ehlo()
-EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
-MAILER_EMAIL_BACKEND = EMAIL_BACKEND
-EMAIL_HOST = 'secure.serverfoo.com'
-EMAIL_HOST_PASSWORD = 'passwordbarbaz'
-EMAIL_HOST_USER = 'myaccount@example.com'
-EMAIL_PORT = 587
-EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 server.login('logmeinpassrecovery@gmail.com', 'logmeinmail')
 
 
