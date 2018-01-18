@@ -238,8 +238,9 @@ def new_account():
 
         if password != password2:
             flash('Passwords do not Match')
-
+    
         else:
+            password = code(password)
             return redirect(url_for('confirm_account'))
 
     return render_template('new_account.html')
@@ -263,11 +264,12 @@ def confirm_account():
         if code == str(comfirm_code):
             confirm_db = sqlite3.connect('users.db')
             curs = confirm_db.cursor()
-            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''',
-                         [(username), (code(password)), (confirm_email)])
-            confirm_db.commit()
-            curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(request.form['username'])])
-            confirm_db.commit()
+            
+            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(username), (password), (confirm_email)
+            create_user_db.commit()
+            curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(username)])
+            create_user_db.commit()
+            
             confirm_db.close()
             flash('Account Created')
 
