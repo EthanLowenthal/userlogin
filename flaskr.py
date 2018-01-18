@@ -330,7 +330,7 @@ def manage_users():
         accounts[i] = str(accounts[i])
 
     if request.method == 'POST':
-        create_user_db = sqlite3.connect('Users.db')
+        create_user_db = sqlite3.connect('users.db')
         curs = create_user_db.cursor()
 
         if request.form['email'] == '':
@@ -361,7 +361,7 @@ def manage_users():
 def add_friend():
 
     if request.method == 'POST':
-        create_user_db = sqlite3.connect('Users.db')
+        create_user_db = sqlite3.connect('users.db')
         curs = create_user_db.cursor()
         curs.execute('''SELECT * from user where username = ?''', [(request.form['friend'])])
         user = curs.fetchall()
@@ -406,7 +406,7 @@ def friend_request():
         else:
             add = False
 
-        friend_db = sqlite3.connect('Users.db')
+        friend_db = sqlite3.connect('users.db')
         curs = friend_db.cursor()
         curs.execute('''SELECT requests from friends where account = ?''', [(session['user'][0])])
         user = curs.fetchone()
@@ -458,7 +458,7 @@ def friend_request():
 @app.route('/friends')
 def friends():
 
-    friend_db = sqlite3.connect('Users.db')
+    friend_db = sqlite3.connect('users.db')
     curs = friend_db.cursor()
 
     return render_template('friends.html', users=curs.execute('''select username from user''').fetchall(), friends=None)
