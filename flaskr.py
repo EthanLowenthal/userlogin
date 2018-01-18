@@ -265,7 +265,7 @@ def confirm_account():
             confirm_db = sqlite3.connect('users.db')
             curs = confirm_db.cursor()
             
-            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(username), (password), (confirm_email)
+            curs.execute('''INSERT INTO user (username, password, email) VALUES (?, ?, ?)''', [(username), (password), (confirm_email)])
             create_user_db.commit()
             curs.execute('''INSERT INTO friends (account) VALUES (?)''', [(username)])
             create_user_db.commit()
