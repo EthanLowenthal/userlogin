@@ -13,4 +13,4 @@ Jinja2==2.8
 SQLAlchemy==1.0.15
 tinycss==0.3
 virtualenv==15.0.3
-Werkzeug==0.11.11
+Werkzeug==0.15.3
